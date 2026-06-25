@@ -26,7 +26,7 @@
     color: #d7e0f5; -webkit-tap-highlight-color: transparent; cursor: crosshair;
   }
   canvas { display: block; position: fixed; inset: 0; z-index: 0; }
-  @media (max-width: 720px) { canvas { filter: saturate(1.2) brightness(1.12); } }
+  @media (max-width: 720px) { canvas { filter: saturate(1.32) brightness(1.16) contrast(1.06); } }
 
   .vignette {
     position: fixed; inset: 0; pointer-events: none; z-index: 2;
@@ -40,13 +40,13 @@
     background-size: 160px 160px;
   }
 
-  .brand { position: fixed; z-index: 3; pointer-events: none; top: clamp(20px,4vw,42px); left: clamp(20px,4vw,42px); }
-  .wordmark { display: inline-block; pointer-events: auto; text-decoration: none; font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: clamp(13px,1.4vw,16px); letter-spacing: 0.42em; text-transform: lowercase; color: rgba(215,224,245,0.5); transition: color .2s; }
-  .wordmark b { color: rgba(215,224,245,0.88); font-weight: 600; }
-  .wordmark:hover { color: rgba(215,224,245,0.8); }
+  .brand { position: fixed; z-index: 3; pointer-events: none; top: clamp(20px,4vw,42px); left: clamp(20px,4vw,42px); text-shadow: 0 1px 14px rgba(2,4,10,0.9), 0 0 4px rgba(2,4,10,0.7); }
+  .wordmark { display: inline-block; pointer-events: auto; text-decoration: none; font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: clamp(13px,1.4vw,16px); letter-spacing: 0.42em; text-transform: lowercase; color: rgba(224,232,252,0.82); transition: color .2s; }
+  .wordmark b { color: rgba(238,244,255,0.98); font-weight: 600; }
+  .wordmark:hover { color: rgba(238,244,255,0.92); }
   .wordmark:hover b { color: #fff; }
-  .tag { margin-top: 9px; font-size: clamp(9px,0.95vw,11px); letter-spacing: 0.18em; text-transform: lowercase; color: rgba(245,197,66,0.5); }
-  .credit { margin-top: 16px; font-size: clamp(9px,0.9vw,11px); letter-spacing: 0.14em; color: rgba(215,224,245,0.5); }
+  .tag { margin-top: 9px; font-size: clamp(9px,0.95vw,11px); letter-spacing: 0.18em; text-transform: lowercase; color: rgba(248,206,92,0.92); }
+  .credit { margin-top: 16px; font-size: clamp(9px,0.9vw,11px); letter-spacing: 0.14em; color: rgba(224,232,252,0.78); }
   .credit a { pointer-events: auto; text-decoration: none; color: rgba(245,197,66,0.85); font-weight: 600; letter-spacing: 0.16em; border-bottom: 1px solid rgba(245,197,66,0.28); transition: color .2s, border-color .2s; }
   .credit a:hover { color: #f5c542; border-color: rgba(245,197,66,0.75); }
   .site {
@@ -90,16 +90,16 @@
     background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12);
     color: rgba(215,224,245,0.7); font: inherit; font-size: 12px; line-height: 1;
   }
-  .placard .ttl { font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase; color: rgba(245,197,66,0.62); margin-bottom: 11px; }
-  .placard p { font-size: clamp(10px,1vw,12px); line-height: 1.72; letter-spacing: 0.015em; color: rgba(215,224,245,0.44); margin-bottom: 9px; }
-  .placard p b { color: rgba(215,224,245,0.74); font-weight: 400; }
-  .placard p .au { color: rgba(245,197,66,0.78); }
-  .placard p .cr { color: rgba(170,205,235,0.8); }
+  .placard .ttl { font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase; color: rgba(248,206,92,0.85); margin-bottom: 11px; }
+  .placard p { font-size: clamp(10px,1vw,12px); line-height: 1.72; letter-spacing: 0.015em; color: rgba(222,230,250,0.66); margin-bottom: 9px; }
+  .placard p b { color: rgba(235,242,255,0.9); font-weight: 500; }
+  .placard p .au { color: rgba(248,206,92,0.92); }
+  .placard p .cr { color: rgba(180,214,244,0.95); }
   .placard .howto { margin-top: 13px; padding-top: 13px; border-top: 1px solid rgba(255,255,255,0.08); }
-  .placard .howto-ttl { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(170,205,235,0.7); margin-bottom: 8px; }
-  .placard .howto-p { font-size: 11px; line-height: 1.62; color: rgba(215,224,245,0.5); margin-bottom: 12px; }
-  .placard .legend-row { display: flex; align-items: center; gap: 11px; margin-bottom: 9px; font-size: 11px; line-height: 1.4; color: rgba(215,224,245,0.5); }
-  .placard .legend-row b { color: rgba(215,224,245,0.8); font-weight: 600; }
+  .placard .howto-ttl { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(184,216,244,0.92); margin-bottom: 8px; }
+  .placard .howto-p { font-size: 11px; line-height: 1.62; color: rgba(222,230,250,0.7); margin-bottom: 12px; }
+  .placard .legend-row { display: flex; align-items: center; gap: 11px; margin-bottom: 9px; font-size: 11px; line-height: 1.4; color: rgba(222,230,250,0.72); }
+  .placard .legend-row b { color: rgba(238,244,255,0.95); font-weight: 600; }
   .placard .gly { width: 24px; height: 24px; flex: none; }
   .placard .gly.wave { filter: drop-shadow(0 0 4px rgba(150,200,240,0.65)); transform-origin: center; animation: wavePulse 2.6s ease-in-out infinite; }
   .placard .gly.gem { filter: drop-shadow(0 0 4px rgba(245,197,66,0.5)); }
@@ -107,8 +107,8 @@
   .placard .gly.beam { filter: drop-shadow(0 0 4px rgba(245,197,66,0.5)); }
   .placard .gly.hubidx { filter: drop-shadow(0 0 4px rgba(178,208,236,0.5)); }
   .placard .gly.hubeng { filter: drop-shadow(0 0 5px rgba(150,210,245,0.6)); }
-  .placard .howto-p b { color: rgba(215,224,245,0.78); font-weight: 600; }
-  .placard .howto .note { margin-top: 12px; margin-bottom: 0; color: rgba(215,224,245,0.46); }
+  .placard .howto-p b { color: rgba(238,244,255,0.92); font-weight: 600; }
+  .placard .howto .note { margin-top: 12px; margin-bottom: 0; color: rgba(222,230,250,0.64); }
   @keyframes wavePulse { 0%,100% { opacity: 0.82; transform: scale(1); } 50% { opacity: 1; transform: scale(1.07); } }
 
   /* sparkle toggle + sheet/popover */
@@ -163,9 +163,9 @@
     .placard p { font-size: 12.5px; }
   }
 
-  .placard .tryit { margin-top: 13px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.08); font-size: 10.5px; line-height: 1.75; color: rgba(215,224,245,0.45); }
-  .placard .tryit-ttl { color: rgba(245,197,66,0.72); letter-spacing: 0.2em; text-transform: uppercase; font-size: 10px; margin-right: 7px; }
-  .placard .tryit b { color: rgba(215,224,245,0.74); font-weight: 600; }
+  .placard .tryit { margin-top: 13px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.08); font-size: 10.5px; line-height: 1.75; color: rgba(222,230,250,0.62); }
+  .placard .tryit-ttl { color: rgba(248,206,92,0.85); letter-spacing: 0.2em; text-transform: uppercase; font-size: 10px; margin-right: 7px; }
+  .placard .tryit b { color: rgba(238,244,255,0.9); font-weight: 600; }
 
   .prompt {
     position: fixed; z-index: 4; left: 50%; bottom: clamp(76px,12vh,116px); transform: translateX(-50%);
@@ -305,10 +305,10 @@
   ];
 
   const LINK_DIST = Math.min(260, Math.max(W,H)*0.22);
-  const MAX_LINKS=3, MAX_GEN=4, MAX_NODES=200, MAX_R=17;
-  const REPEL=1700, REPEL_RANGE=160, SPRING_K=0.016, REST=96, CENTER_K=0.0006;
+  const MAX_LINKS=3, MAX_GEN=4, MAX_NODES=160, MAX_R=22;
+  const REPEL=1700, REPEL_RANGE=160, SPRING_K=0.016, REST=96, CENTER_K=0.0009;
   const DAMP=0.86, MAX_V=7, CURSOR_REPEL=2600, CURSOR_RANGE=130;
-  const CRAWL_INT=7000, QUERY_INT=6800;
+  const CRAWL_INT=5000, QUERY_INT=4500;
 
   const pointer = { x:-1e4, y:-1e4, inside:false };
   let grabbed=null;
@@ -329,7 +329,7 @@
   }
 
   function addNode(x, y, scale=1) {
-    const r0=(3+Math.random()*2.5)*(0.7+0.3*scale);
+    const r0=(4+Math.random()*3)*(0.78+0.22*scale);
     const n={ kind:'source', x, y, vx:0, vy:0, fx:0, fy:0, baseR:r0, targetR:r0,
               col:nextColor(), fireT:-1, scanT:-1, indexed:false, seed:Math.random()*9, cites:0 };
     const cand=[];
@@ -416,6 +416,9 @@
     for (const n of nodes){
       if (n.kind!=='source'){ n.x=n.ax*W; n.y=n.ay*H; continue; }
       if (n===grabbed){ n.vx=n.vy=0; continue; }
+      const mg=48;
+      if (n.x<mg) n.fx+=(mg-n.x)*0.0018; else if (n.x>W-mg) n.fx-=(n.x-(W-mg))*0.0018;
+      if (n.y<mg) n.fy+=(mg-n.y)*0.0018; else if (n.y>H-mg) n.fy-=(n.y-(H-mg))*0.0018;
       n.vx=(n.vx+n.fx)*DAMP; n.vy=(n.vy+n.fy)*DAMP;
       const sp=Math.hypot(n.vx,n.vy);
       if (sp>MAX_V){ n.vx=n.vx/sp*MAX_V; n.vy=n.vy/sp*MAX_V; }
@@ -637,7 +640,7 @@
         sg.addColorStop(0,GOLD+(0.9*a)+')'); sg.addColorStop(1,GOLD+'0)');
         ctx.fillStyle=sg; ctx.beginPath(); ctx.arc(p.x,p.y,7,0,Math.PI*2); ctx.fill(); }
       if (!bm.rewarded && bm.age>=travel){ bm.rewarded=true;
-        bm.engine.fireT=now; bm.node.cites++; bm.node.targetR=Math.min(MAX_R,bm.node.targetR+1.6); bm.node.fireT=now;
+        bm.engine.fireT=now; bm.node.cites++; bm.node.targetR=Math.min(MAX_R,bm.node.targetR+2.4); bm.node.fireT=now;
         if (!hintedCite){ hintedCite=true; hints.push({ node:bm.node, text:'cited \u2014 now it grows', col:GOLD, off:28, age:0 }); } }
     }
 
@@ -736,7 +739,7 @@
 
   // ---- interaction ----
   const GRAB_R=30;
-  let down=false, threading=false, lastSpawn=0;
+  let down=false, threading=false, lastSpawn=0, lastSpawnX=0, lastSpawnY=0;
   const pos=e=>{ const t=e.touches?e.touches[0]:e; return {x:t.clientX,y:t.clientY}; };
   function nearestNode(x,y,within){ let best=null,bd=within;
     for (const n of nodes){ const d=Math.hypot(n.x-x,n.y-y); if (d<bd){bd=d;best=n;} } return best; }
@@ -755,14 +758,14 @@
       tag(hit, hit.cites>0 ? (hit.cites>1 ? ('cited \u00d7'+hit.cites) : 'cited') : (hit.indexed ? 'indexed' : 'not yet indexed'),
           hit.cites>0 ? GOLD : (hit.indexed ? STEEL : 'rgba(200,210,230,'), hit.baseR*1.4+18); return; }
     grabbed=null; threading=true; const nn=addNode(p.x,p.y); haptic(8);
-    tag(nn, 'not yet indexed', 'rgba(200,210,230,', nn.baseR*1.4+16); lastSpawn=performance.now();
+    tag(nn, 'not yet indexed', 'rgba(200,210,230,', nn.baseR*1.4+16); lastSpawn=performance.now(); lastSpawnX=p.x; lastSpawnY=p.y;
   }
   function move(e){
     const p=pos(e); pointer.x=p.x; pointer.y=p.y; pointer.inside=true;
     if (!down) return; e.preventDefault();
     if (grabbed){ grabbed.x=p.x; grabbed.y=p.y; }
     else if (threading){ const now=performance.now();
-      if (now-lastSpawn>80){ addNode(p.x,p.y,0.7); lastSpawn=now; } }
+      if (now-lastSpawn>150 && Math.hypot(p.x-lastSpawnX,p.y-lastSpawnY)>24){ addNode(p.x,p.y,0.85); lastSpawn=now; lastSpawnX=p.x; lastSpawnY=p.y; } }
   }
   const end=()=>{ down=false; threading=false; grabbed=null; };
 
