@@ -88,8 +88,21 @@
   .placard {
     position: fixed; z-index: 6; pointer-events: none;
     bottom: clamp(20px,4vw,42px); left: clamp(20px,4vw,42px); max-width: 340px;
+    max-height: min(80vh, 660px); overflow-y: auto;
+    background: rgba(9,13,24,0.8); backdrop-filter: blur(20px) saturate(1.3);
+    border: 1px solid rgba(255,255,255,0.08); border-radius: 18px;
+    padding: 22px 22px 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    opacity: 0; transform: translateY(12px) scale(0.98); transform-origin: bottom left;
+    transition: opacity .3s ease, transform .32s cubic-bezier(.22,.61,.36,1);
   }
-  .placard .grab, .placard .close { display: none; }
+  .placard.open { opacity: 1; transform: translateY(0) scale(1); pointer-events: auto; }
+  .placard .grab { display: none; }
+  .placard .close {
+    display: block; position: absolute; top: 13px; right: 14px;
+    width: 28px; height: 28px; border-radius: 999px; cursor: pointer;
+    background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12);
+    color: rgba(215,224,245,0.7); font: inherit; font-size: 12px; line-height: 1;
+  }
   .placard .ttl { font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase; color: rgba(245,197,66,0.62); margin-bottom: 11px; }
   .placard p { font-size: clamp(10px,1vw,12px); line-height: 1.72; letter-spacing: 0.015em; color: rgba(215,224,245,0.44); margin-bottom: 9px; }
   .placard p b { color: rgba(215,224,245,0.74); font-weight: 400; }
@@ -109,8 +122,20 @@
   .placard .howto .note { margin-top: 12px; margin-bottom: 0; color: rgba(215,224,245,0.46); }
   @keyframes wavePulse { 0%,100% { opacity: 0.82; transform: scale(1); } 50% { opacity: 1; transform: scale(1.07); } }
 
-  /* mobile "what is this?" pill + bottom sheet */
-  .info-toggle { display: none; }
+  /* sparkle toggle + sheet/popover */
+  .info-toggle {
+    display: flex; align-items: center; justify-content: center;
+    position: fixed; z-index: 5; pointer-events: auto;
+    left: clamp(20px,4vw,42px); bottom: calc(clamp(20px,4vw,42px) + env(safe-area-inset-bottom));
+    width: 48px; height: 48px; padding: 0; border-radius: 50%;
+    background: rgba(10,14,26,0.5); border: 1px solid rgba(245,197,66,0.38);
+    cursor: pointer; backdrop-filter: blur(12px) saturate(1.3);
+    box-shadow: 0 6px 22px rgba(0,0,0,0.45); animation: infoPing 3.2s ease-in-out infinite;
+    transition: transform .15s ease, opacity .3s ease;
+  }
+  .info-toggle svg { width: 21px; height: 21px; display: block; }
+  .info-toggle:active { transform: scale(0.93); }
+  .info-toggle.hidden { opacity: 0; pointer-events: none; transform: scale(0.8); }
   .sheet-backdrop { display: none; }
   @keyframes infoPing {
     0%,100% { box-shadow: 0 6px 22px rgba(0,0,0,0.45), 0 0 0 0 rgba(245,197,66,0); }
@@ -118,19 +143,6 @@
   }
 
   @media (max-width: 720px) {
-    .info-toggle {
-      display: flex; align-items: center; justify-content: center;
-      position: fixed; z-index: 5; pointer-events: auto;
-      left: clamp(16px,4vw,24px); bottom: calc(clamp(16px,4vw,24px) + env(safe-area-inset-bottom));
-      width: 48px; height: 48px; padding: 0; border-radius: 50%;
-      background: rgba(10,14,26,0.5); border: 1px solid rgba(245,197,66,0.38);
-      cursor: pointer; backdrop-filter: blur(12px) saturate(1.3);
-      box-shadow: 0 6px 22px rgba(0,0,0,0.45); animation: infoPing 3.2s ease-in-out infinite;
-      transition: transform .15s ease;
-    }
-    .info-toggle svg { width: 21px; height: 21px; display: block; }
-    .info-toggle:active { transform: scale(0.93); }
-
     .sheet-backdrop {
       display: block; position: fixed; inset: 0; z-index: 5;
       background: rgba(2,3,8,0.45); opacity: 0; pointer-events: none; transition: opacity .35s ease;
@@ -142,12 +154,13 @@
       max-height: 82vh; overflow-y: auto; -webkit-overflow-scrolling: touch;
       padding: 16px clamp(20px,6vw,28px) calc(26px + env(safe-area-inset-bottom));
       background: rgba(9,13,24,0.72); backdrop-filter: blur(20px) saturate(1.3);
-      border-top: 1px solid rgba(255,255,255,0.08);
+      border: none; border-top: 1px solid rgba(255,255,255,0.08);
       border-radius: 22px 22px 0 0;
       box-shadow: 0 -24px 70px rgba(0,0,0,0.55);
-      transform: translateY(112%); transition: transform .42s cubic-bezier(.22,.61,.36,1);
+      opacity: 1; transform: translateY(112%) scale(1);
+      transition: transform .42s cubic-bezier(.22,.61,.36,1);
     }
-    .placard.open { transform: translateY(0); }
+    .placard.open { transform: translateY(0) scale(1); }
     .placard .grab {
       display: block; width: 40px; height: 4px; border-radius: 999px;
       background: rgba(255,255,255,0.22); margin: 0 auto 16px;
@@ -776,8 +789,8 @@
   const infoBtn=document.getElementById('infoBtn');
   const backdrop=document.getElementById('backdrop');
   const sheetClose=document.getElementById('sheetClose');
-  const openSheet=()=>{ placard&&placard.classList.add('open'); backdrop&&backdrop.classList.add('open'); haptic(10); };
-  const closeSheet=()=>{ placard&&placard.classList.remove('open'); backdrop&&backdrop.classList.remove('open'); haptic(5); };
+  const openSheet=()=>{ placard&&placard.classList.add('open'); backdrop&&backdrop.classList.add('open'); infoBtn&&infoBtn.classList.add('hidden'); haptic(10); };
+  const closeSheet=()=>{ placard&&placard.classList.remove('open'); backdrop&&backdrop.classList.remove('open'); infoBtn&&infoBtn.classList.remove('hidden'); haptic(5); };
   if (infoBtn) infoBtn.addEventListener('click', openSheet);
   if (backdrop) backdrop.addEventListener('click', closeSheet);
   if (sheetClose) sheetClose.addEventListener('click', closeSheet);
