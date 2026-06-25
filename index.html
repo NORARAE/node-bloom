@@ -26,10 +26,11 @@
     color: #d7e0f5; -webkit-tap-highlight-color: transparent; cursor: crosshair;
   }
   canvas { display: block; position: fixed; inset: 0; z-index: 0; }
+  @media (max-width: 720px) { canvas { filter: saturate(1.2) brightness(1.12); } }
 
   .vignette {
     position: fixed; inset: 0; pointer-events: none; z-index: 2;
-    background: radial-gradient(135% 135% at 52% 48%, transparent 28%, rgba(2,3,8,0.9) 100%);
+    background: radial-gradient(145% 145% at 50% 47%, transparent 33%, rgba(2,3,8,0.78) 100%);
     mix-blend-mode: multiply;
   }
   /* film grain — kills banding, adds tactile depth */
@@ -38,20 +39,6 @@
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
     background-size: 160px 160px;
   }
-
-  .roles {
-    position: fixed; z-index: 3; pointer-events: none; top: clamp(18px,3.4vw,30px);
-    left: 50%; transform: translateX(-50%); text-align: center; line-height: 2;
-  }
-  .roles .r { font-size: clamp(9px,0.95vw,11px); letter-spacing: 0.1em; color: rgba(215,224,245,0.4); white-space: nowrap; }
-  .roles .r .k { font-weight: 600; }
-  .roles .r.idx .k { color: rgba(178,208,236,0.82); }
-  .roles .r.eng .k { color: rgba(186,228,255,0.9); }
-  .roles .dim { color: rgba(215,224,245,0.3); }
-  .roles .sw { display: inline-block; width: 9px; height: 9px; margin-right: 7px; vertical-align: middle; border-radius: 50%; }
-  .roles .sw.idx { border: 1px solid rgba(178,208,236,0.8); }
-  .roles .sw.eng { background: radial-gradient(circle at 40% 35%, #ffffff, #a9def5 70%); box-shadow: 0 0 7px rgba(186,228,255,0.8); }
-  @media (max-width: 720px) { .roles { display: none; } }
 
   .brand { position: fixed; z-index: 3; pointer-events: none; top: clamp(20px,4vw,42px); left: clamp(20px,4vw,42px); }
   .wordmark { display: inline-block; pointer-events: auto; text-decoration: none; font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: clamp(13px,1.4vw,16px); letter-spacing: 0.42em; text-transform: lowercase; color: rgba(215,224,245,0.5); transition: color .2s; }
@@ -118,6 +105,8 @@
   .placard .gly.gem { filter: drop-shadow(0 0 4px rgba(245,197,66,0.5)); }
   .placard .gly.idx { filter: drop-shadow(0 0 4px rgba(178,208,236,0.55)); }
   .placard .gly.beam { filter: drop-shadow(0 0 4px rgba(245,197,66,0.5)); }
+  .placard .gly.hubidx { filter: drop-shadow(0 0 4px rgba(178,208,236,0.5)); }
+  .placard .gly.hubeng { filter: drop-shadow(0 0 5px rgba(150,210,245,0.6)); }
   .placard .howto-p b { color: rgba(215,224,245,0.78); font-weight: 600; }
   .placard .howto .note { margin-top: 12px; margin-bottom: 0; color: rgba(215,224,245,0.46); }
   @keyframes wavePulse { 0%,100% { opacity: 0.82; transform: scale(1); } 50% { opacity: 1; transform: scale(1.07); } }
@@ -211,11 +200,6 @@
   <div class="vignette"></div>
   <div class="grain"></div>
 
-  <div class="roles">
-    <div class="r idx"><span class="sw idx"></span><span class="k">indexes</span> &mdash; Google &middot; Bing &middot; Brave <span class="dim">crawl the open web</span></div>
-    <div class="r eng"><span class="sw eng"></span><span class="k">answer engines</span> &mdash; ChatGPT &middot; Perplexity &middot; Gemini &middot; Claude <span class="dim">cite sources</span></div>
-  </div>
-
   <div class="brand">
     <a class="wordmark" href="https://playplaycode.myportfolio.com/" target="_blank" rel="noopener">playplay<b>code</b></a>
     <div class="tag">how ai search chooses what to cite</div>
@@ -235,7 +219,16 @@
     <p>The new answer engines &mdash; ChatGPT, Perplexity, Gemini, Claude &mdash; don't rank a list of links; they <b>cite</b> a few trusted sources inside the answer.</p>
     <p>But they mostly don't crawl alone &mdash; they ride the classic indexes. <span class="cr">Bing</span> feeds ChatGPT, <span class="cr">Google</span> feeds Gemini, <span class="cr">Brave</span> feeds Claude (Perplexity runs its own). So you must be <b>crawlable &amp; indexed</b> first &mdash; then <span class="au">EEAT &amp; authority</span>, <span class="au">schema</span>, and <span class="au">FAQ</span> structure decide who gets cited.</p>
     <div class="howto">
-      <div class="howto-ttl">what you're watching</div>
+      <div class="howto-ttl">the players</div>
+      <div class="legend-row">
+        <svg class="gly hubidx" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="5.4" fill="#b6d0eb" fill-opacity="0.5"/><circle cx="12" cy="12" r="9" fill="none" stroke="#b6d0eb" stroke-width="1.2" stroke-dasharray="2 3.5" opacity="0.85"/></svg>
+        <span><b>indexes</b> &mdash; Google &middot; Bing &middot; Brave: the crawlers that index the web</span>
+      </div>
+      <div class="legend-row">
+        <svg class="gly hubeng" viewBox="0 0 24 24" aria-hidden="true"><defs><radialGradient id="engG" cx="42%" cy="38%" r="62%"><stop offset="0%" stop-color="#ffffff"/><stop offset="45%" stop-color="#9fe0f5"/><stop offset="100%" stop-color="#9a78f0"/></radialGradient></defs><circle cx="12" cy="12" r="6.4" fill="url(#engG)"/><circle cx="12" cy="12" r="9.4" fill="none" stroke="#bfe6ff" stroke-width="1" opacity="0.5"/></svg>
+        <span><b>answer engines</b> &mdash; ChatGPT &middot; Perplexity &middot; Gemini &middot; Claude: they cite sources</span>
+      </div>
+      <div class="howto-ttl" style="margin-top:15px;">what you're watching</div>
       <p class="howto-p">Indexes sweep <b>outward</b> across the web; the pages they reach become <b>indexed</b> (discoverable). When an engine <b>cites</b> a source, a gold beam travels <b>back</b> through its index to the engine &mdash; the source flares, crystallizes, and its gem grows a little with every citation.</p>
       <div class="legend-row">
         <svg class="gly wave" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.1" fill="#9ec6ea"/><circle cx="12" cy="12" r="6.5" fill="none" stroke="#9ec6ea" stroke-width="1.3" opacity="0.7"/><circle cx="12" cy="12" r="10" fill="none" stroke="#9ec6ea" stroke-width="1" opacity="0.4"/></svg>
@@ -285,8 +278,8 @@
   }
 
   const palette = [
-    { h:168,s:88,l:68 }, { h:196,s:92,l:66 }, { h:268,s:82,l:74 },
-    { h:322,s:86,l:72 }, { h:42,s:95,l:70 }, { h:142,s:78,l:66 },
+    { h:170,s:96,l:70 }, { h:194,s:98,l:68 }, { h:266,s:90,l:76 },
+    { h:320,s:94,l:74 }, { h:44,s:98,l:71 }, { h:150,s:88,l:68 },
   ];
   const GOLD = 'rgba(245,197,66,';
   const CYAN = 'rgba(150,200,240,';
@@ -656,8 +649,8 @@
       const r=n.baseR+breath;
       const gr=r*1.7;
       const g=ctx.createRadialGradient(n.x,n.y,0,n.x,n.y,gr);
-      g.addColorStop(0,`hsla(${h},${s}%,${l+14}%,0.78)`);
-      g.addColorStop(0.4,`hsla(${h},${s}%,${l}%,0.14)`);
+      g.addColorStop(0,`hsla(${h},${s}%,${l+16}%,0.85)`);
+      g.addColorStop(0.4,`hsla(${h},${s}%,${l}%,0.16)`);
       g.addColorStop(1,`hsla(${h},${s}%,${l}%,0)`);
       ctx.fillStyle=g; ctx.beginPath(); ctx.arc(n.x,n.y,gr,0,Math.PI*2); ctx.fill();
 
