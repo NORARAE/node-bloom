@@ -6,32 +6,55 @@
 <title>Node Bloom — How AI Search Chooses What to Cite · PlayPlayCode</title>
 <meta name="description" content="An interactive visualization of how AI answer engines — ChatGPT, Perplexity, Gemini, Claude — crawl the web through Google, Bing & Brave and cite trusted sources. AEO/GEO, made visible. Designed + coded by Nora Genetti.">
 <meta name="author" content="Nora Genetti">
-<!-- Social preview (LinkedIn, X, etc.) — replace the two URLs once your site + preview image are live -->
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Node Bloom — How AI Search Chooses What to Cite">
 <meta property="og:description" content="An interactive visualization of how AI answer engines crawl the web and cite trusted sources. AEO/GEO, made visible.">
 <meta property="og:url" content="https://node-bloom.netlify.app/">
-<meta property="og:image" content="https://node-bloom.netlify.app/">
+<meta property="og:image" content="https://node-bloom.netlify.app/apple-touch-icon.png">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Node Bloom — How AI Search Chooses What to Cite">
 <meta name="twitter:description" content="An interactive visualization of how AI answer engines crawl the web and cite trusted sources. AEO/GEO, made visible.">
-<meta name="twitter:image" content="https://node-bloom.netlify.app/">
+<meta name="twitter:image" content="https://node-bloom.netlify.app/apple-touch-icon.png">
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   html, body { height: 100%; overflow: hidden; background: #05070f; }
   body {
-    font-family: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, monospace;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     color: #d7e0f5; -webkit-tap-highlight-color: transparent; cursor: crosshair;
   }
-  canvas { display: block; position: fixed; inset: 0; }
+  canvas { display: block; position: fixed; inset: 0; z-index: 0; }
 
   .vignette {
     position: fixed; inset: 0; pointer-events: none; z-index: 2;
     background: radial-gradient(135% 135% at 52% 48%, transparent 28%, rgba(2,3,8,0.9) 100%);
     mix-blend-mode: multiply;
   }
+  /* film grain — kills banding, adds tactile depth */
+  .grain {
+    position: fixed; inset: 0; pointer-events: none; z-index: 2; opacity: 0.05; mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size: 160px 160px;
+  }
+
+  .roles {
+    position: fixed; z-index: 3; pointer-events: none; top: clamp(18px,3.4vw,30px);
+    left: 50%; transform: translateX(-50%); text-align: center; line-height: 2;
+  }
+  .roles .r { font-size: clamp(9px,0.95vw,11px); letter-spacing: 0.1em; color: rgba(215,224,245,0.4); white-space: nowrap; }
+  .roles .r .k { font-weight: 600; }
+  .roles .r.idx .k { color: rgba(178,208,236,0.82); }
+  .roles .r.eng .k { color: rgba(186,228,255,0.9); }
+  .roles .dim { color: rgba(215,224,245,0.3); }
+  .roles .sw { display: inline-block; width: 9px; height: 9px; margin-right: 7px; vertical-align: middle; border-radius: 50%; }
+  .roles .sw.idx { border: 1px solid rgba(178,208,236,0.8); }
+  .roles .sw.eng { background: radial-gradient(circle at 40% 35%, #ffffff, #a9def5 70%); box-shadow: 0 0 7px rgba(186,228,255,0.8); }
+  @media (max-width: 720px) { .roles { display: none; } }
+
   .brand { position: fixed; z-index: 3; pointer-events: none; top: clamp(20px,4vw,42px); left: clamp(20px,4vw,42px); }
-  .wordmark { display: inline-block; pointer-events: auto; text-decoration: none; font-size: clamp(13px,1.4vw,16px); letter-spacing: 0.42em; text-transform: lowercase; color: rgba(215,224,245,0.5); transition: color .2s; }
+  .wordmark { display: inline-block; pointer-events: auto; text-decoration: none; font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: clamp(13px,1.4vw,16px); letter-spacing: 0.42em; text-transform: lowercase; color: rgba(215,224,245,0.5); transition: color .2s; }
   .wordmark b { color: rgba(215,224,245,0.88); font-weight: 600; }
   .wordmark:hover { color: rgba(215,224,245,0.8); }
   .wordmark:hover b { color: #fff; }
@@ -46,18 +69,112 @@
     transition: color .2s, border-color .2s;
   }
   .site:hover { color: #f5c542; border-color: rgba(245,197,66,0.75); }
+  .cta {
+    display: inline-block; margin-top: 14px; pointer-events: auto; text-decoration: none;
+    font-size: clamp(10px,0.95vw,12px); letter-spacing: 0.14em; color: #f5c542;
+    border: 1px solid rgba(245,197,66,0.45); border-radius: 999px; padding: 8px 15px;
+    transition: background .2s, color .2s, border-color .2s;
+  }
+  .cta span { color: rgba(245,197,66,0.65); margin-left: 7px; }
+  .cta:hover { background: #f5c542; color: #05070f; border-color: #f5c542; }
+  .cta:hover span { color: rgba(5,7,15,0.7); }
+  .placard .sheet-cta {
+    display: inline-block; margin-top: 14px; pointer-events: auto; text-decoration: none;
+    font-size: 11px; letter-spacing: 0.03em; color: rgba(215,224,245,0.6);
+  }
+  .placard .sheet-cta b { color: #f5c542; font-weight: 600; }
+  .placard .sheet-cta:hover b { text-decoration: underline; }
 
-  .placard { position: fixed; z-index: 3; pointer-events: none; bottom: clamp(20px,4vw,42px); left: clamp(20px,4vw,42px); max-width: 340px; }
+  .placard {
+    position: fixed; z-index: 6; pointer-events: none;
+    bottom: clamp(20px,4vw,42px); left: clamp(20px,4vw,42px); max-width: 340px;
+  }
+  .placard .grab, .placard .close { display: none; }
   .placard .ttl { font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase; color: rgba(245,197,66,0.62); margin-bottom: 11px; }
   .placard p { font-size: clamp(10px,1vw,12px); line-height: 1.72; letter-spacing: 0.015em; color: rgba(215,224,245,0.44); margin-bottom: 9px; }
   .placard p b { color: rgba(215,224,245,0.74); font-weight: 400; }
   .placard p .au { color: rgba(245,197,66,0.78); }
   .placard p .cr { color: rgba(170,205,235,0.8); }
-  .placard .key { margin-top: 11px; font-size: 10px; line-height: 2; color: rgba(215,224,245,0.4); }
-  .placard .dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-right: 8px; vertical-align: middle; }
-  .placard .dot.cyan { background: #9ec6ea; box-shadow: 0 0 8px rgba(150,200,240,0.7); }
-  .placard .dot.gold { background: #f5c542; box-shadow: 0 0 8px rgba(245,197,66,0.7); }
-  @media (max-width: 720px) { .placard { display: none; } }
+  .placard .howto { margin-top: 13px; padding-top: 13px; border-top: 1px solid rgba(255,255,255,0.08); }
+  .placard .howto-ttl { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(170,205,235,0.7); margin-bottom: 8px; }
+  .placard .howto-p { font-size: 11px; line-height: 1.62; color: rgba(215,224,245,0.5); margin-bottom: 12px; }
+  .placard .legend-row { display: flex; align-items: center; gap: 11px; margin-bottom: 9px; font-size: 11px; line-height: 1.4; color: rgba(215,224,245,0.5); }
+  .placard .legend-row b { color: rgba(215,224,245,0.8); font-weight: 600; }
+  .placard .gly { width: 24px; height: 24px; flex: none; }
+  .placard .gly.wave { filter: drop-shadow(0 0 4px rgba(150,200,240,0.65)); transform-origin: center; animation: wavePulse 2.6s ease-in-out infinite; }
+  .placard .gly.gem { filter: drop-shadow(0 0 4px rgba(245,197,66,0.5)); }
+  .placard .gly.idx { filter: drop-shadow(0 0 4px rgba(178,208,236,0.55)); }
+  .placard .gly.beam { filter: drop-shadow(0 0 4px rgba(245,197,66,0.5)); }
+  .placard .howto-p b { color: rgba(215,224,245,0.78); font-weight: 600; }
+  .placard .howto .note { margin-top: 12px; margin-bottom: 0; color: rgba(215,224,245,0.46); }
+  @keyframes wavePulse { 0%,100% { opacity: 0.82; transform: scale(1); } 50% { opacity: 1; transform: scale(1.07); } }
+
+  /* mobile "what is this?" pill + bottom sheet */
+  .info-toggle { display: none; }
+  .sheet-backdrop { display: none; }
+  @keyframes infoPing {
+    0%,100% { box-shadow: 0 6px 22px rgba(0,0,0,0.45), 0 0 0 0 rgba(245,197,66,0); }
+    50%     { box-shadow: 0 6px 22px rgba(0,0,0,0.45), 0 0 0 7px rgba(245,197,66,0.13); }
+  }
+
+  @media (max-width: 720px) {
+    .info-toggle {
+      display: flex; align-items: center; justify-content: center;
+      position: fixed; z-index: 5; pointer-events: auto;
+      left: clamp(16px,4vw,24px); bottom: calc(clamp(16px,4vw,24px) + env(safe-area-inset-bottom));
+      width: 48px; height: 48px; padding: 0; border-radius: 50%;
+      background: rgba(10,14,26,0.5); border: 1px solid rgba(245,197,66,0.38);
+      cursor: pointer; backdrop-filter: blur(12px) saturate(1.3);
+      box-shadow: 0 6px 22px rgba(0,0,0,0.45); animation: infoPing 3.2s ease-in-out infinite;
+      transition: transform .15s ease;
+    }
+    .info-toggle svg { width: 21px; height: 21px; display: block; }
+    .info-toggle:active { transform: scale(0.93); }
+
+    .sheet-backdrop {
+      display: block; position: fixed; inset: 0; z-index: 5;
+      background: rgba(2,3,8,0.45); opacity: 0; pointer-events: none; transition: opacity .35s ease;
+    }
+    .sheet-backdrop.open { opacity: 1; pointer-events: auto; }
+
+    .placard {
+      left: 0; right: 0; bottom: 0; max-width: none; pointer-events: auto;
+      max-height: 82vh; overflow-y: auto; -webkit-overflow-scrolling: touch;
+      padding: 16px clamp(20px,6vw,28px) calc(26px + env(safe-area-inset-bottom));
+      background: rgba(9,13,24,0.72); backdrop-filter: blur(20px) saturate(1.3);
+      border-top: 1px solid rgba(255,255,255,0.08);
+      border-radius: 22px 22px 0 0;
+      box-shadow: 0 -24px 70px rgba(0,0,0,0.55);
+      transform: translateY(112%); transition: transform .42s cubic-bezier(.22,.61,.36,1);
+    }
+    .placard.open { transform: translateY(0); }
+    .placard .grab {
+      display: block; width: 40px; height: 4px; border-radius: 999px;
+      background: rgba(255,255,255,0.22); margin: 0 auto 16px;
+    }
+    .placard .close {
+      display: block; position: absolute; top: 14px; right: 16px;
+      width: 30px; height: 30px; border-radius: 999px; cursor: pointer;
+      background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12);
+      color: rgba(215,224,245,0.7); font: inherit; font-size: 13px; line-height: 1;
+    }
+    .placard p { font-size: 12.5px; }
+  }
+
+  .placard .tryit { margin-top: 13px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.08); font-size: 10.5px; line-height: 1.75; color: rgba(215,224,245,0.45); }
+  .placard .tryit-ttl { color: rgba(245,197,66,0.72); letter-spacing: 0.2em; text-transform: uppercase; font-size: 10px; margin-right: 7px; }
+  .placard .tryit b { color: rgba(215,224,245,0.74); font-weight: 600; }
+
+  .prompt {
+    position: fixed; z-index: 4; left: 50%; bottom: clamp(76px,12vh,116px); transform: translateX(-50%);
+    pointer-events: none; text-align: center; white-space: nowrap;
+    font-size: clamp(10px,1vw,12px); letter-spacing: 0.13em; color: rgba(215,224,245,0.62);
+    background: rgba(8,12,24,0.42); border: 1px solid rgba(255,255,255,0.09); border-radius: 999px;
+    padding: 9px 18px; backdrop-filter: blur(8px);
+    opacity: 0; transition: opacity .6s ease;
+  }
+  .prompt.show { opacity: 1; }
+  .prompt b { color: rgba(245,197,66,0.85); font-weight: 600; }
 
   .controls {
     position: fixed; z-index: 3; bottom: clamp(20px,4vw,42px); right: clamp(20px,4vw,42px);
@@ -79,23 +196,60 @@
 <body>
   <canvas id="c"></canvas>
   <div class="vignette"></div>
+  <div class="grain"></div>
+
+  <div class="roles">
+    <div class="r idx"><span class="sw idx"></span><span class="k">indexes</span> &mdash; Google &middot; Bing &middot; Brave <span class="dim">crawl the open web</span></div>
+    <div class="r eng"><span class="sw eng"></span><span class="k">answer engines</span> &mdash; ChatGPT &middot; Perplexity &middot; Gemini &middot; Claude <span class="dim">cite sources</span></div>
+  </div>
+
   <div class="brand">
     <a class="wordmark" href="https://playplaycode.myportfolio.com/" target="_blank" rel="noopener">playplay<b>code</b></a>
     <div class="tag">how ai search chooses what to cite</div>
     <div class="credit">designed + coded by <a href="https://www.linkedin.com/in/ngenetti/" target="_blank" rel="noopener">Nora G.</a></div>
-    <a class="site" href="https://seoaico.com" target="_blank" rel="noopener">seoaico.com &rarr;</a>
+    <a class="cta" href="https://seoaico.com" target="_blank" rel="noopener">work with me <span>seoaico.com</span> &rarr;</a>
   </div>
-  <div class="placard">
+
+  <div class="sheet-backdrop" id="backdrop"></div>
+  <button class="info-toggle" id="infoBtn" aria-label="What is this?">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 C 12.6 7.4 , 16.6 9 , 22 12 C 16.6 15 , 12.6 16.6 , 12 22 C 11.4 16.6 , 7.4 15 , 2 12 C 7.4 9 , 11.4 7.4 , 12 2 Z" fill="#f5c542"/></svg>
+  </button>
+
+  <div class="placard" id="placard">
+    <span class="grab"></span>
+    <button class="close" id="sheetClose" aria-label="Close">&#10005;</button>
     <div class="ttl">the open web &rarr; the index &rarr; the citation</div>
     <p>The new answer engines &mdash; ChatGPT, Perplexity, Gemini, Claude &mdash; don't rank a list of links; they <b>cite</b> a few trusted sources inside the answer.</p>
     <p>But they mostly don't crawl alone &mdash; they ride the classic indexes. <span class="cr">Bing</span> feeds ChatGPT, <span class="cr">Google</span> feeds Gemini, <span class="cr">Brave</span> feeds Claude (Perplexity runs its own). So you must be <b>crawlable &amp; indexed</b> first &mdash; then <span class="au">EEAT &amp; authority</span>, <span class="au">schema</span>, and <span class="au">FAQ</span> structure decide who gets cited.</p>
-    <div class="key">
-      <span class="dot cyan"></span>an index crawling the open web<br>
-      <span class="dot gold"></span>a source cited through its index &mdash; and growing
+    <div class="howto">
+      <div class="howto-ttl">what you're watching</div>
+      <p class="howto-p">Indexes sweep <b>outward</b> across the web; the pages they reach become <b>indexed</b> (discoverable). When an engine <b>cites</b> a source, a gold beam travels <b>back</b> through its index to the engine &mdash; the source flares, crystallizes, and its gem grows a little with every citation.</p>
+      <div class="legend-row">
+        <svg class="gly wave" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.1" fill="#9ec6ea"/><circle cx="12" cy="12" r="6.5" fill="none" stroke="#9ec6ea" stroke-width="1.3" opacity="0.7"/><circle cx="12" cy="12" r="10" fill="none" stroke="#9ec6ea" stroke-width="1" opacity="0.4"/></svg>
+        <span><b>cyan ripple</b> &mdash; an index (Google &middot; Bing &middot; Brave) crawling the web</span>
+      </div>
+      <div class="legend-row">
+        <svg class="gly idx" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8" fill="none" stroke="#c6e0f8" stroke-width="1.6"/><circle cx="12" cy="12" r="2.4" fill="#c6e0f8"/></svg>
+        <span><b>ringed dot</b> &mdash; an <b>indexed</b> source: discoverable, not yet cited</span>
+      </div>
+      <div class="legend-row">
+        <svg class="gly gem" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10.5" fill="none" stroke="#c6e0f8" stroke-width="1.1" opacity="0.7"/><polygon points="12,5 17.5,9 17.5,15 12,19 6.5,15 6.5,9" fill="#f5c542" fill-opacity="0.92" stroke="#ffe6a3" stroke-width="0.8" stroke-linejoin="round"/><path d="M12,5 V19 M6.5,9 L17.5,15 M17.5,9 L6.5,15" stroke="#fff2cf" stroke-width="0.5" opacity="0.5"/></svg>
+        <span><b>gem in a cool ring</b> &mdash; an engine <b>cited</b> it &mdash; now indexed + cited, gaining authority as it grows</span>
+      </div>
+      <div class="legend-row">
+        <svg class="gly beam" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 18 Q 13 8 20 6" fill="none" stroke="#f5c542" stroke-width="1.4" opacity="0.8" stroke-linecap="round"/><circle cx="20" cy="6" r="1.8" fill="#ffe39a"/><path d="M6 18 L6 13 M6 18 L6 23 M6 18 L1.5 18 M6 18 L10.5 18" stroke="#f5c542" stroke-width="1.2" opacity="0.9" stroke-linecap="round"/><circle cx="6" cy="18" r="1.7" fill="#fff6da"/></svg>
+        <span><b>gold beam + flare</b> &mdash; a citation in motion: a cited source beams back through its index to the engine and <b>flares</b> the moment it lands</span>
+      </div>
+      <p class="howto-p note"><b>Why it drifts:</b> linked sources spring together while every source gently repels the rest &mdash; so the web self-organizes into clusters, the way a real knowledge graph groups related pages.</p>
     </div>
+    <div class="tryit"><span class="tryit-ttl">try it</span>tap empty space to add a source &middot; tap an <b>engine</b> to send a query &middot; tap an <b>index</b> to crawl &middot; drag to weave the web</div>
+    <a class="sheet-cta" href="https://seoaico.com" target="_blank" rel="noopener">Want your brand cited by AI search? <b>Work with me &rarr;</b></a>
   </div>
+
+  <div class="prompt" id="prompt"><b>tap anywhere</b> to add a source &middot; drag to weave the web</div>
+
   <div class="controls">
-    <button id="publish" class="pub" title="inject fresh knowledge onto the web">publish</button>
+    <button id="publish" class="pub" title="generate fresh content on the open web">generate</button>
     <button id="deindex" title="wipe the indexed web">de-index</button>
   </div>
 
@@ -106,6 +260,7 @@
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const haptic = (p) => { try { if (navigator.vibrate) navigator.vibrate(p); } catch (e) {} };
 
   let W, H, DPR;
   function resize() {
@@ -117,8 +272,8 @@
   }
 
   const palette = [
-    { h:168,s:85,l:62 }, { h:196,s:90,l:60 }, { h:268,s:78,l:68 },
-    { h:322,s:82,l:66 }, { h:42,s:92,l:64 }, { h:142,s:70,l:60 },
+    { h:168,s:88,l:68 }, { h:196,s:92,l:66 }, { h:268,s:82,l:74 },
+    { h:322,s:86,l:72 }, { h:42,s:95,l:70 }, { h:142,s:78,l:66 },
   ];
   const GOLD = 'rgba(245,197,66,';
   const CYAN = 'rgba(150,200,240,';
@@ -129,6 +284,7 @@
   const nodes = [];   const indexes = [];   const engines = [];   const crawlers = [];
   let edges = [];   let pulses = [];
   let rings = [];     let feeds = [];   let beams = [];   let reqs = [];   let pending = [];
+  let hints = [];     let hintedCrawl = false, hintedCite = false, hintedIndex = false;
 
   const INDEX_DEFS = [
     { name:'Google', ax:0.40, ay:0.40 },
@@ -169,7 +325,7 @@
   function addNode(x, y, scale=1) {
     const r0=(3+Math.random()*2.5)*(0.7+0.3*scale);
     const n={ kind:'source', x, y, vx:0, vy:0, fx:0, fy:0, baseR:r0, targetR:r0,
-              col:nextColor(), fireT:-1, scanT:-1, seed:Math.random()*9, cites:0 };
+              col:nextColor(), fireT:-1, scanT:-1, indexed:false, seed:Math.random()*9, cites:0 };
     const cand=[];
     for (const o of nodes){ if (o.kind!=='source') continue;
       const d=Math.hypot(o.x-x,o.y-y); if (d<LINK_DIST) cand.push({o,d}); }
@@ -201,7 +357,8 @@
       pulses.push({ edge:e, from:node, p:0, col:node.col, gen, tail:[] }); }
   }
 
-  function crawl(hub){ hub.crawlT=performance.now(); rings.push({ age:0, hit:new Set(), o:hub }); }
+  function crawl(hub){ hub.crawlT=performance.now(); rings.push({ age:0, hit:new Set(), o:hub });
+    if (!hintedCrawl){ hintedCrawl=true; hints.push({ hub, text:'crawling the open web', col:CYAN, off:34, age:0 }); } }
 
   function query(e){
     const pool=sources(); if (pool.length<2) return;
@@ -221,6 +378,7 @@
   function deindex(){
     for (let i=nodes.length-1;i>=0;i--) if (nodes[i].kind==='source') nodes.splice(i,1);
     edges=[]; pulses=[]; beams=[]; feeds=[]; pending=[]; reqs=[]; grabbed=null;
+    hints=[]; hintedCrawl=false; hintedIndex=false; hintedCite=false;
   }
 
   function physics(dt) {
@@ -265,23 +423,23 @@
     ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
   }
 
-  // intentional atmosphere: cited sources bleed soft color into the field,
-  // so the misty blend becomes a living register of where authority pools
   function colorHaze(now){
     ctx.globalCompositeOperation='lighter';
     for (const n of sources()){
       if (n.cites<=0) continue;
-      const breath=reduceMotion?1:0.85+0.15*Math.sin(now*0.0016+n.seed);
-      const rad=(46+Math.min(n.cites,7)*16)*breath;
+      const breath=reduceMotion?1:0.9+0.1*Math.sin(now*0.0016+n.seed);
+      const rad=(30+Math.min(n.cites,7)*10)*breath;
+      const a=Math.min(0.14,0.06+n.cites*0.012);
       const g=ctx.createRadialGradient(n.x,n.y,0,n.x,n.y,rad);
-      g.addColorStop(0,`hsla(${n.col.h},${n.col.s}%,${n.col.l}%,${Math.min(0.12,0.05+n.cites*0.012)})`);
+      g.addColorStop(0,`hsla(${n.col.h},${n.col.s}%,${n.col.l}%,${a})`);
+      g.addColorStop(0.4,`hsla(${n.col.h},${n.col.s}%,${n.col.l}%,${a*0.32})`);
       g.addColorStop(1,`hsla(${n.col.h},${n.col.s}%,${n.col.l}%,0)`);
       ctx.fillStyle=g; ctx.beginPath(); ctx.arc(n.x,n.y,rad,0,Math.PI*2); ctx.fill();
     }
     for (const e of engines){
-      const g=ctx.createRadialGradient(e.x,e.y,0,e.x,e.y,90);
-      g.addColorStop(0,'hsla(200,70%,80%,0.05)'); g.addColorStop(1,'hsla(200,70%,80%,0)');
-      ctx.fillStyle=g; ctx.beginPath(); ctx.arc(e.x,e.y,90,0,Math.PI*2); ctx.fill();
+      const g=ctx.createRadialGradient(e.x,e.y,0,e.x,e.y,58);
+      g.addColorStop(0,'hsla(200,72%,82%,0.045)'); g.addColorStop(0.5,'hsla(200,72%,82%,0.014)'); g.addColorStop(1,'hsla(200,72%,82%,0)');
+      ctx.fillStyle=g; ctx.beginPath(); ctx.arc(e.x,e.y,58,0,Math.PI*2); ctx.fill();
     }
     ctx.globalCompositeOperation='source-over';
   }
@@ -299,82 +457,93 @@
     return arc(A,E,t);
   }
 
-  // a cited source crystallizes into a slowly-turning, light-catching gem
+  // GEM — glassy crystal with depth: vertical light gradient, facet cuts, specular glint
   function drawGem(n, R, now){
     const { h,s,l }=n.col, N=6;
-    const rot = (reduceMotion?0:now*0.0003) + n.seed;
-    const lightA = reduceMotion?0:now*0.0009;
+    const rot=(reduceMotion?0:now*0.0003)+n.seed;
+    const lightA=reduceMotion?-2.2:now*0.0009;
     const outer=[], inner=[];
     for (let i=0;i<N;i++){
-      const a=rot + i*(Math.PI*2/N);
+      const a=rot+i*(Math.PI*2/N);
       outer.push([n.x+Math.cos(a)*R, n.y+Math.sin(a)*R]);
-      const ai=a + Math.PI/N;
-      inner.push([n.x+Math.cos(ai)*R*0.46, n.y+Math.sin(ai)*R*0.46, ai]);
+      const ai=a+Math.PI/N;
+      inner.push([n.x+Math.cos(ai)*R*0.46, n.y+Math.sin(ai)*R*0.46]);
     }
-    // crown facets — shaded by a rotating light so the gem shimmers
+    const path=()=>{ ctx.beginPath(); outer.forEach((p,i)=> i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1])); ctx.closePath(); };
+    // glassy body — light from the top, deep at the base
+    ctx.save(); path(); ctx.clip();
+    const vg=ctx.createLinearGradient(n.x, n.y-R, n.x, n.y+R);
+    vg.addColorStop(0,   `hsla(${h},${s}%,${Math.min(94,l+28)}%,0.96)`);
+    vg.addColorStop(0.5, `hsla(${h},${s}%,${l}%,0.9)`);
+    vg.addColorStop(1,   `hsla(${h},${s}%,${Math.max(16,l-24)}%,0.96)`);
+    ctx.fillStyle=vg; ctx.fillRect(n.x-R, n.y-R, R*2, R*2);
+    // specular glint
+    const sx=n.x+Math.cos(lightA)*R*0.32, sy=n.y+Math.sin(lightA)*R*0.32;
+    const sg=ctx.createRadialGradient(sx,sy,0,sx,sy,R*0.95);
+    sg.addColorStop(0,'rgba(255,255,255,0.55)'); sg.addColorStop(0.4,'rgba(255,255,255,0.08)'); sg.addColorStop(1,'rgba(255,255,255,0)');
+    ctx.fillStyle=sg; ctx.fillRect(n.x-R, n.y-R, R*2, R*2);
+    ctx.restore();
+    // facet cut-lines
     for (let i=0;i<N;i++){
       const o1=outer[i], o2=outer[(i+1)%N], mid=inner[i];
-      const lit=Math.cos(mid[2]-lightA);
-      const shade=Math.max(22,Math.min(92,l+lit*18));
-      ctx.beginPath(); ctx.moveTo(o1[0],o1[1]); ctx.lineTo(o2[0],o2[1]); ctx.lineTo(mid[0],mid[1]); ctx.closePath();
-      ctx.fillStyle=`hsla(${h},${s}%,${shade}%,0.6)`; ctx.fill();
+      ctx.beginPath(); ctx.moveTo(o1[0],o1[1]); ctx.lineTo(mid[0],mid[1]); ctx.lineTo(o2[0],o2[1]);
+      ctx.strokeStyle=`hsla(${h},${s}%,${Math.min(96,l+30)}%,0.3)`; ctx.lineWidth=1; ctx.stroke();
     }
-    // table (flat top)
     ctx.beginPath(); inner.forEach((p,i)=> i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1])); ctx.closePath();
-    ctx.fillStyle=`hsla(${h},${s}%,${Math.min(95,l+20)}%,0.72)`; ctx.fill();
+    ctx.strokeStyle=`hsla(${h},${s}%,${Math.min(96,l+34)}%,0.45)`; ctx.lineWidth=1; ctx.stroke();
     // crisp rim
-    ctx.beginPath(); outer.forEach((p,i)=> i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1])); ctx.closePath();
-    ctx.strokeStyle=`hsla(${h},${s}%,${Math.min(96,l+30)}%,0.9)`; ctx.lineWidth=1.1; ctx.stroke();
+    path(); ctx.strokeStyle=`hsla(${h},${s}%,${Math.min(97,l+32)}%,0.95)`; ctx.lineWidth=1.3; ctx.stroke();
   }
 
-  // new-age index: counter-rotating lattice rings + soft steel core
+  // INDEX — glassy lit disc + one refined rotating lattice ring + specular
   function drawIndex(ix, now){
-    const a0 = reduceMotion?0:now*0.0005 + ix.seed;
-    ctx.save(); ctx.translate(ix.x,ix.y); ctx.rotate(a0);
-    ctx.setLineDash([3,6]); ctx.beginPath(); ctx.arc(0,0,14,0,Math.PI*2);
-    ctx.strokeStyle=STEEL+'0.5)'; ctx.lineWidth=1; ctx.stroke(); ctx.setLineDash([]); ctx.restore();
-    ctx.save(); ctx.translate(ix.x,ix.y); ctx.rotate(-a0*0.7);
-    ctx.setLineDash([2,8]); ctx.beginPath(); ctx.arc(0,0,20,0,Math.PI*2);
-    ctx.strokeStyle=STEEL+'0.28)'; ctx.lineWidth=1; ctx.stroke(); ctx.setLineDash([]); ctx.restore();
-    const g=ctx.createRadialGradient(ix.x,ix.y,0,ix.x,ix.y,22);
-    g.addColorStop(0,STEEL+'0.5)'); g.addColorStop(0.4,STEEL+'0.14)'); g.addColorStop(1,STEEL+'0)');
     ctx.globalCompositeOperation='lighter';
-    ctx.fillStyle=g; ctx.beginPath(); ctx.arc(ix.x,ix.y,22,0,Math.PI*2); ctx.fill();
+    const bloom=ctx.createRadialGradient(ix.x,ix.y,0,ix.x,ix.y,30);
+    bloom.addColorStop(0,STEEL+'0.16)'); bloom.addColorStop(1,STEEL+'0)');
+    ctx.fillStyle=bloom; ctx.beginPath(); ctx.arc(ix.x,ix.y,30,0,Math.PI*2); ctx.fill();
+    const g=ctx.createRadialGradient(ix.x-3,ix.y-4,0,ix.x,ix.y,15);
+    g.addColorStop(0,'rgba(228,240,252,0.8)'); g.addColorStop(0.5,STEEL+'0.28)'); g.addColorStop(1,STEEL+'0)');
+    ctx.fillStyle=g; ctx.beginPath(); ctx.arc(ix.x,ix.y,15,0,Math.PI*2); ctx.fill();
     if (ix.crawlT>0){ const age=(now-ix.crawlT)/700;
-      if (age<1){ ctx.beginPath(); ctx.arc(ix.x,ix.y,14+age*26,0,Math.PI*2);
+      if (age<1){ ctx.beginPath(); ctx.arc(ix.x,ix.y,12+age*26,0,Math.PI*2);
         ctx.strokeStyle=CYAN+((1-age)*0.4)+')'; ctx.lineWidth=1.4; ctx.stroke(); } else ix.crawlT=-1; }
     ctx.globalCompositeOperation='source-over';
-    ctx.font='9px ui-monospace, monospace'; ctx.textAlign='center';
-    ctx.fillStyle=STEEL+'0.6)'; ctx.fillText(ix.name.toUpperCase(), ix.x, ix.y+32);
+    ctx.save(); ctx.translate(ix.x,ix.y); if (!reduceMotion) ctx.rotate(now*0.0004+ix.seed);
+    ctx.setLineDash([2,7]); ctx.beginPath(); ctx.arc(0,0,16,0,Math.PI*2);
+    ctx.strokeStyle=STEEL+'0.55)'; ctx.lineWidth=1; ctx.stroke(); ctx.setLineDash([]); ctx.restore();
+    ctx.beginPath(); ctx.arc(ix.x,ix.y,9,0,Math.PI*2); ctx.strokeStyle=STEEL+'0.55)'; ctx.lineWidth=1; ctx.stroke();
+    ctx.beginPath(); ctx.arc(ix.x-2.5,ix.y-3,1.5,0,Math.PI*2); ctx.fillStyle='rgba(255,255,255,0.85)'; ctx.fill();
+    ctx.font='600 9px system-ui, "Segoe UI", Roboto, sans-serif'; ctx.textAlign='center';
+    ctx.fillStyle=STEEL+'0.62)'; ctx.fillText(ix.name.toUpperCase(), ix.x, ix.y+31);
   }
 
-  // new-age engine: holographic orb — breathing aura + iridescent cyan→violet bloom
+  // ENGINE — luminous frosted orb lit from the upper-left, crisp specular + ring + bloom
   function drawEngine(e, now){
-    const pulse = reduceMotion?0.5 : 0.5+0.5*Math.sin(now*0.0016+e.seed);
+    const pulse=reduceMotion?0.5:0.5+0.5*Math.sin(now*0.0016+e.seed);
     ctx.globalCompositeOperation='lighter';
+    const bloom=ctx.createRadialGradient(e.x,e.y,0,e.x,e.y,46);
+    bloom.addColorStop(0,'hsla(198,90%,80%,0.20)'); bloom.addColorStop(1,'hsla(265,80%,74%,0)');
+    ctx.fillStyle=bloom; ctx.beginPath(); ctx.arc(e.x,e.y,46,0,Math.PI*2); ctx.fill();
     for (let r=0;r<3;r++){
-      ctx.beginPath(); ctx.arc(e.x,e.y,14+r*9+pulse*5,0,Math.PI*2);
-      ctx.strokeStyle=`hsla(195,85%,84%,${(0.18-r*0.05)*(0.55+0.45*pulse)})`;
-      ctx.lineWidth=1; ctx.stroke();
+      ctx.beginPath(); ctx.arc(e.x,e.y,15+r*8+pulse*5,0,Math.PI*2);
+      ctx.strokeStyle=`hsla(196,90%,86%,${(0.16-r*0.045)*(0.55+0.45*pulse)})`; ctx.lineWidth=1; ctx.stroke();
     }
-    if (!reduceMotion){ ctx.save(); ctx.translate(e.x,e.y); ctx.rotate(now*0.0006+e.seed);
-      ctx.beginPath(); ctx.arc(0,0,12,0.2,0.2+Math.PI*0.9);
-      ctx.strokeStyle='hsla(265,80%,82%,0.45)'; ctx.lineWidth=1.4; ctx.stroke(); ctx.restore(); }
     if (e.fireT>0){ const age=(now-e.fireT)/700;
       if (age<1){ ctx.beginPath(); ctx.arc(e.x,e.y,14+age*30,0,Math.PI*2);
         ctx.strokeStyle=GOLD+((1-age)*0.6)+')'; ctx.lineWidth=2; ctx.stroke(); } else e.fireT=-1; }
-    const g=ctx.createRadialGradient(e.x,e.y,0,e.x,e.y,32);
-    g.addColorStop(0,'hsla(200,55%,99%,0.95)');
-    g.addColorStop(0.22,'hsla(190,85%,80%,0.55)');
-    g.addColorStop(0.55,'hsla(265,75%,74%,0.2)');
-    g.addColorStop(1,'hsla(265,75%,74%,0)');
-    ctx.fillStyle=g; ctx.beginPath(); ctx.arc(e.x,e.y,32,0,Math.PI*2); ctx.fill();
-    // crisp core
-    ctx.beginPath(); ctx.arc(e.x,e.y,2.4,0,Math.PI*2);
-    ctx.fillStyle='rgba(255,255,255,0.95)'; ctx.fill();
+    // glassy iridescent core, lit upper-left
+    const g=ctx.createRadialGradient(e.x-4,e.y-5,0,e.x,e.y,18);
+    g.addColorStop(0,'hsla(200,60%,100%,0.98)');
+    g.addColorStop(0.4,'hsla(190,90%,82%,0.6)');
+    g.addColorStop(0.75,'hsla(265,80%,76%,0.28)');
+    g.addColorStop(1,'hsla(265,80%,76%,0)');
+    ctx.fillStyle=g; ctx.beginPath(); ctx.arc(e.x,e.y,18,0,Math.PI*2); ctx.fill();
     ctx.globalCompositeOperation='source-over';
-    ctx.font='10px ui-monospace, monospace'; ctx.textAlign='center';
-    ctx.fillStyle='rgba(222,240,255,0.62)'; ctx.fillText(e.name.toUpperCase(), e.x, e.y+40);
+    ctx.beginPath(); ctx.arc(e.x,e.y,11+pulse*1.4,0,Math.PI*2);
+    ctx.strokeStyle='hsla(196,90%,90%,0.5)'; ctx.lineWidth=1; ctx.stroke();
+    ctx.beginPath(); ctx.arc(e.x-3.4,e.y-4.4,2,0,Math.PI*2); ctx.fillStyle='rgba(255,255,255,0.95)'; ctx.fill();
+    ctx.font='600 10px system-ui, "Segoe UI", Roboto, sans-serif'; ctx.textAlign='center';
+    ctx.fillStyle='rgba(222,240,255,0.66)'; ctx.fillText(e.name.toUpperCase(), e.x, e.y+38);
   }
 
   let last=performance.now();
@@ -406,7 +575,9 @@
       ctx.beginPath(); ctx.arc(rg.o.x,rg.o.y,rad,0,Math.PI*2);
       ctx.strokeStyle=CYAN+a+')'; ctx.lineWidth=1.2; ctx.stroke();
       for (const n of sources()){ if (rg.hit.has(n)) continue;
-        if (Math.hypot(n.x-rg.o.x,n.y-rg.o.y)<rad){ rg.hit.add(n); n.scanT=now; feeds.push({ node:n, hub:rg.o, age:0 }); } }
+        if (Math.hypot(n.x-rg.o.x,n.y-rg.o.y)<rad){ rg.hit.add(n); n.scanT=now; feeds.push({ node:n, hub:rg.o, age:0 });
+          if (!n.indexed){ n.indexed=true;
+            if (!hintedIndex){ hintedIndex=true; hints.push({ node:n, text:'indexed', col:STEEL, off:24, age:0 }); } } } }
     }
     ctx.globalCompositeOperation='source-over';
 
@@ -460,32 +631,51 @@
         sg.addColorStop(0,GOLD+(0.9*a)+')'); sg.addColorStop(1,GOLD+'0)');
         ctx.fillStyle=sg; ctx.beginPath(); ctx.arc(p.x,p.y,7,0,Math.PI*2); ctx.fill(); }
       if (!bm.rewarded && bm.age>=travel){ bm.rewarded=true;
-        bm.engine.fireT=now; bm.node.cites++; bm.node.targetR=Math.min(MAX_R,bm.node.targetR+1.6); bm.node.fireT=now; }
+        bm.engine.fireT=now; bm.node.cites++; bm.node.targetR=Math.min(MAX_R,bm.node.targetR+1.6); bm.node.fireT=now;
+        if (!hintedCite){ hintedCite=true; hints.push({ node:bm.node, text:'cited \u2014 now it grows', col:GOLD, off:28, age:0 }); } }
     }
 
-    // sources: nascent sparks that crystallize into faceted gems as they earn citations
+    // sources: sparks that crystallize into glassy gems as they earn citations
     for (const n of sources()){
       n.baseR += (n.targetR-n.baseR)*0.08;
       const { h,s,l }=n.col;
       const breath=reduceMotion?0:Math.sin(now*0.002+n.seed)*0.6;
       const r=n.baseR+breath;
-      // tight luminous glow (small radius keeps it defined, not foggy)
-      const gr=r*1.9;
+      const gr=r*1.7;
       const g=ctx.createRadialGradient(n.x,n.y,0,n.x,n.y,gr);
-      g.addColorStop(0,`hsla(${h},${s}%,${l+12}%,0.68)`);
-      g.addColorStop(0.5,`hsla(${h},${s}%,${l}%,0.16)`);
+      g.addColorStop(0,`hsla(${h},${s}%,${l+14}%,0.78)`);
+      g.addColorStop(0.4,`hsla(${h},${s}%,${l}%,0.14)`);
       g.addColorStop(1,`hsla(${h},${s}%,${l}%,0)`);
       ctx.fillStyle=g; ctx.beginPath(); ctx.arc(n.x,n.y,gr,0,Math.PI*2); ctx.fill();
 
       if (n.cites>0){
+        // CITED — warm authority bloom + glassy gem (solid, hot, valuable)
+        const gb=ctx.createRadialGradient(n.x,n.y,0,n.x,n.y,r*2.7);
+        const ga=Math.min(0.4,0.16+n.cites*0.04);
+        gb.addColorStop(0,GOLD+ga+')');
+        gb.addColorStop(0.45,GOLD+(ga*0.3)+')');
+        gb.addColorStop(1,GOLD+'0)');
+        ctx.fillStyle=gb; ctx.beginPath(); ctx.arc(n.x,n.y,r*2.7,0,Math.PI*2); ctx.fill();
         ctx.globalCompositeOperation='source-over';
-        drawGem(n, r*1.4, now);
-        ctx.beginPath(); ctx.arc(n.x,n.y,r*1.4+4,0,Math.PI*2);
-        ctx.strokeStyle=GOLD+Math.min(0.55,0.22+n.cites*0.05)+')'; ctx.lineWidth=1.2; ctx.stroke();
+        drawGem(n, r*1.45, now);
+        ctx.beginPath(); ctx.arc(n.x,n.y,r*1.45+4,0,Math.PI*2);
+        ctx.strokeStyle=GOLD+Math.min(0.6,0.28+n.cites*0.05)+')'; ctx.lineWidth=1.3; ctx.stroke();
+        // still indexed: cool ring wraps around the cited gem
+        ctx.beginPath(); ctx.arc(n.x,n.y,r*1.45+9,0,Math.PI*2);
+        ctx.strokeStyle='rgba(198,224,248,0.5)'; ctx.lineWidth=1; ctx.stroke();
         ctx.globalCompositeOperation='lighter';
-      } else {
+      } else if (n.indexed){
+        // INDEXED — cool hollow ring (discoverable, not yet valued): outline, not fill
+        ctx.beginPath(); ctx.arc(n.x,n.y,r+5,0,Math.PI*2);
+        ctx.strokeStyle='rgba(140,195,235,0.26)'; ctx.lineWidth=3.6; ctx.stroke();
+        ctx.beginPath(); ctx.arc(n.x,n.y,r+5,0,Math.PI*2);
+        ctx.strokeStyle='rgba(198,224,248,0.85)'; ctx.lineWidth=1.4; ctx.stroke();
         ctx.beginPath(); ctx.arc(n.x,n.y,Math.max(1.3,r*0.5),0,Math.PI*2);
         ctx.fillStyle=`hsla(${h},${Math.min(100,s)}%,${Math.min(96,l+34)}%,0.95)`; ctx.fill();
+      } else {
+        // RAW — a faint, undiscovered spark
+        ctx.beginPath(); ctx.arc(n.x,n.y,Math.max(1.2,r*0.45),0,Math.PI*2);
+        ctx.fillStyle=`hsla(${h},${Math.min(100,s)}%,${Math.min(96,l+28)}%,0.7)`; ctx.fill();
       }
 
       if (n.scanT>0){ const age=(now-n.scanT)/450;
@@ -520,6 +710,21 @@
     }
     ctx.globalCompositeOperation='source-over';
 
+    // first-time guide labels — appear once, then fade
+    for (let i=hints.length-1;i>=0;i--){
+      const ht=hints[i]; ht.age+=dt; const life=4.2;
+      if (ht.age>life){ hints.splice(i,1); continue; }
+      const obj=ht.hub||ht.node; if (!obj){ hints.splice(i,1); continue; }
+      let a=1; if (ht.age<0.3) a=ht.age/0.3; else if (ht.age>life-1.3) a=(life-ht.age)/1.3;
+      a=Math.max(0,Math.min(1,a));
+      const x=obj.x, y=obj.y-(ht.off||30);
+      ctx.strokeStyle=ht.col+(0.45*a)+')'; ctx.lineWidth=1;
+      ctx.beginPath(); ctx.moveTo(x,y+5); ctx.lineTo(x,y+13); ctx.stroke();
+      ctx.font='600 12px system-ui, "Segoe UI", Roboto, sans-serif'; ctx.textAlign='center';
+      ctx.fillStyle=ht.col+(0.95*a)+')';
+      ctx.fillText(ht.text, x, y);
+    }
+
     requestAnimationFrame(frame);
   }
 
@@ -530,13 +735,21 @@
   function nearestNode(x,y,within){ let best=null,bd=within;
     for (const n of nodes){ const d=Math.hypot(n.x-x,n.y-y); if (d<bd){bd=d;best=n;} } return best; }
 
+  function tag(obj, text, col, off){
+    for (let i=hints.length-1;i>=0;i--){ if (hints[i].node===obj) hints.splice(i,1); }
+    hints.push({ node:obj, text, col, off, age:0 });
+  }
+
   function start(e){
-    down=true; const p=pos(e); pointer.x=p.x; pointer.y=p.y; pointer.inside=true;
+    down=true; hidePrompt(); const p=pos(e); pointer.x=p.x; pointer.y=p.y; pointer.inside=true;
     const hit=nearestNode(p.x,p.y,GRAB_R);
-    if (hit && hit.kind==='engine'){ query(hit); return; }
-    if (hit && hit.kind==='index'){ crawl(hit); return; }
-    if (hit && hit.kind==='source'){ grabbed=hit; threading=false; return; }
-    grabbed=null; threading=true; addNode(p.x,p.y); lastSpawn=performance.now();
+    if (hit && hit.kind==='engine'){ query(hit); haptic(12); tag(hit, hit.self?'answer engine \u00b7 own crawler':'answer engine', 'rgba(186,228,255,', 46); return; }
+    if (hit && hit.kind==='index'){ crawl(hit); haptic(12); tag(hit, 'search index', STEEL, 36); return; }
+    if (hit && hit.kind==='source'){ grabbed=hit; threading=false; haptic(6);
+      tag(hit, hit.cites>0 ? (hit.cites>1 ? ('cited \u00d7'+hit.cites) : 'cited') : (hit.indexed ? 'indexed' : 'not yet indexed'),
+          hit.cites>0 ? GOLD : (hit.indexed ? STEEL : 'rgba(200,210,230,'), hit.baseR*1.4+18); return; }
+    grabbed=null; threading=true; const nn=addNode(p.x,p.y); haptic(8);
+    tag(nn, 'not yet indexed', 'rgba(200,210,230,', nn.baseR*1.4+16); lastSpawn=performance.now();
   }
   function move(e){
     const p=pos(e); pointer.x=p.x; pointer.y=p.y; pointer.inside=true;
@@ -555,8 +768,25 @@
   window.addEventListener('touchend', end);
   window.addEventListener('mouseout', e=>{ if (!e.relatedTarget) pointer.inside=false; });
   window.addEventListener('resize', resize);
-  document.getElementById('publish').addEventListener('click', publish);
-  document.getElementById('deindex').addEventListener('click', deindex);
+  const pubBtn=document.getElementById('publish'); if (pubBtn) pubBtn.addEventListener('click', ()=>{ publish(); haptic([8,26,8]); });
+  const deiBtn=document.getElementById('deindex'); if (deiBtn) deiBtn.addEventListener('click', ()=>{ deindex(); haptic(18); });
+
+  // ---- mobile info bottom-sheet ----
+  const placard=document.getElementById('placard');
+  const infoBtn=document.getElementById('infoBtn');
+  const backdrop=document.getElementById('backdrop');
+  const sheetClose=document.getElementById('sheetClose');
+  const openSheet=()=>{ placard&&placard.classList.add('open'); backdrop&&backdrop.classList.add('open'); haptic(10); };
+  const closeSheet=()=>{ placard&&placard.classList.remove('open'); backdrop&&backdrop.classList.remove('open'); haptic(5); };
+  if (infoBtn) infoBtn.addEventListener('click', openSheet);
+  if (backdrop) backdrop.addEventListener('click', closeSheet);
+  if (sheetClose) sheetClose.addEventListener('click', closeSheet);
+
+  // ---- one-time "tap to play" prompt ----
+  const promptEl=document.getElementById('prompt');
+  let promptDone=false;
+  const hidePrompt=()=>{ if (promptDone) return; promptDone=true; if (promptEl) promptEl.classList.remove('show'); };
+  if (promptEl){ setTimeout(()=>{ if (!promptDone) promptEl.classList.add('show'); }, 1200); setTimeout(hidePrompt, 9000); }
 
   resize(); createHubs();
   if (!reduceMotion){
