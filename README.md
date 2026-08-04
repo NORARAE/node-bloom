@@ -20,7 +20,7 @@ a single self-contained `index.html`.
 
 ---
 
-Designed + coded by **Nora Genetti** — PlayPlayCode
-[Portfolio](https://playplayplay.myportfolio.com/) ·
+Designed + coded by **Nora Genetti** — PlayPlayAI
+[Portfolio](https://playplayai.com/) ·
 [LinkedIn](https://www.linkedin.com/in/ngenetti/) ·
 SEOAICo.com
