@@ -1,10 +1,15 @@
 # node-bloom is served from https://bloom.playplayai.com (Vercel).
 # The Netlify copy is retired: send every request there to the canonical
-# host, preserving the path. force = true is required because index.html
-# exists and would otherwise shadow the redirect.
+# host, preserving the path.
 #
-# Scoped to the production context so deploy previews stay reachable.
-[[context.production.redirects]]
+# force = true is required because index.html exists and would otherwise
+# shadow the redirect for "/".
+#
+# This is deliberately NOT context-scoped. [[context.production.redirects]]
+# is silently ignored by Netlify (verified: the rule never applied), so the
+# rule must be global. Deploy previews for this repo therefore redirect too,
+# which is fine — the Netlify site is being retired.
+[[redirects]]
   from = "/*"
   to = "https://bloom.playplayai.com/:splat"
   status = 301
