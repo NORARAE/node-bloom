@@ -22,4 +22,5 @@ a single self-contained `index.html`.
 
 Designed + coded by **PlayPlayAI**
 [playplayai.com](https://playplayai.com) ·
+[LinkedIn](https://www.linkedin.com/in/ngenetti/) ·
 SEOAICo.com

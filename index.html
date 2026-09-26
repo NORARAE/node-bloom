@@ -29,6 +29,21 @@
      trigger the double-tap-to-zoom gesture that iOS Safari cannot undo */
   a, button { touch-action: manipulation; }
   button { min-height: 44px; }
+  /* 44px touch targets on the inline text links with zero layout impact: an
+     absolutely-positioned ::after carries the hit area, so the text keeps its
+     exact size and position. The brand rows sit only ~51px apart, so a band
+     centred on each link would overlap its neighbour and steal its taps —
+     instead the three bands are offset to tile edge-to-edge. Offsets are
+     derived from the fixed margins (16px + 14px) and the minimum line boxes,
+     which is the tightest case; wider viewports only grow the gaps. */
+  .wordmark, .credit a, .cta, .sheet-cta { position: relative; }
+  .wordmark::after, .credit a::after, .cta::after, .sheet-cta::after {
+    content: ""; position: absolute; left: 0; right: 0; height: 44px;
+  }
+  .wordmark::after  { top: -18.5px; }
+  .credit a::after  { top: -25.5px; }
+  .cta::after       { top: -6px; }
+  .sheet-cta::after { top: 50%; transform: translateY(-50%); }
   canvas { display: block; position: fixed; inset: 0; z-index: 0; touch-action: none; }
   @media (max-width: 720px) { canvas { filter: saturate(1.32) brightness(1.16) contrast(1.06); } }
 
