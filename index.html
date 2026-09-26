@@ -2,10 +2,10 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Node Bloom — How AI Search Chooses What to Cite · PlayPlayAI</title>
-<meta name="description" content="An interactive visualization of how AI answer engines — ChatGPT, Perplexity, Gemini, Claude — crawl the web through Google, Bing & Brave and cite trusted sources. AEO/GEO, made visible. Designed + coded by Nora Genetti.">
-<meta name="author" content="Nora Genetti">
+<meta name="description" content="An interactive visualization of how AI answer engines — ChatGPT, Perplexity, Gemini, Claude — crawl the web through Google, Bing & Brave and cite trusted sources. AEO/GEO, made visible. Designed + coded by PlayPlayAI.">
+<meta name="author" content="PlayPlayAI">
 <link rel="icon" href="/favicon.ico" sizes="any">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
@@ -20,12 +20,31 @@
 <meta name="twitter:image" content="https://node-bloom.netlify.app/apple-touch-icon.png">
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  html, body { height: 100%; overflow: hidden; background: #05070f; }
+  html, body { height: 100%; overflow: hidden; background: #05070f; touch-action: manipulation; }
   body {
     font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     color: #d7e0f5; -webkit-tap-highlight-color: transparent; cursor: crosshair;
   }
-  canvas { display: block; position: fixed; inset: 0; z-index: 0; }
+  /* no control may fall below the 44px iOS/WCAG touch target, and none may
+     trigger the double-tap-to-zoom gesture that iOS Safari cannot undo */
+  a, button { touch-action: manipulation; }
+  button { min-height: 44px; }
+  /* 44px touch targets on the inline text links with zero layout impact: an
+     absolutely-positioned ::after carries the hit area, so the text keeps its
+     exact size and position. The brand rows sit only ~51px apart, so a band
+     centred on each link would overlap its neighbour and steal its taps —
+     instead the three bands are offset to tile edge-to-edge. Offsets are
+     derived from the fixed margins (16px + 14px) and the minimum line boxes,
+     which is the tightest case; wider viewports only grow the gaps. */
+  .wordmark, .credit a, .cta, .sheet-cta { position: relative; }
+  .wordmark::after, .credit a::after, .cta::after, .sheet-cta::after {
+    content: ""; position: absolute; left: 0; right: 0; height: 44px;
+  }
+  .wordmark::after  { top: -18.5px; }
+  .credit a::after  { top: -25.5px; }
+  .cta::after       { top: -6px; }
+  .sheet-cta::after { top: 50%; transform: translateY(-50%); }
+  canvas { display: block; position: fixed; inset: 0; z-index: 0; touch-action: none; }
   @media (max-width: 720px) { canvas { filter: saturate(1.32) brightness(1.16) contrast(1.06); } }
 
   .vignette {
@@ -81,12 +100,13 @@
   .placard.open { opacity: 1; transform: translateY(0) scale(1); pointer-events: auto; }
   .placard .grab { display: none; }
   .placard .close {
-    display: block; position: absolute; top: 13px; right: 14px;
-    width: 28px; height: 28px; border-radius: 999px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    position: absolute; top: 10px; right: 10px;
+    width: 44px; height: 44px; border-radius: 999px; cursor: pointer;
     background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12);
     color: rgba(215,224,245,0.7); font: inherit; font-size: 12px; line-height: 1;
   }
-  .placard .ttl { font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase; color: rgba(248,206,92,0.85); margin-bottom: 11px; }
+  .placard .ttl { padding-right: 46px; font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase; color: rgba(248,206,92,0.85); margin-bottom: 11px; }
   .placard p { font-size: clamp(10px,1vw,12px); line-height: 1.72; letter-spacing: 0.015em; color: rgba(222,230,250,0.66); margin-bottom: 9px; }
   .placard p b { color: rgba(235,242,255,0.9); font-weight: 500; }
   .placard p .au { color: rgba(248,206,92,0.92); }
@@ -151,8 +171,9 @@
       background: rgba(255,255,255,0.22); margin: 0 auto 16px;
     }
     .placard .close {
-      display: block; position: absolute; top: 14px; right: 16px;
-      width: 30px; height: 30px; border-radius: 999px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      position: absolute; top: 12px; right: 12px;
+      width: 44px; height: 44px; border-radius: 999px; cursor: pointer;
       background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12);
       color: rgba(215,224,245,0.7); font: inherit; font-size: 13px; line-height: 1;
     }
@@ -182,7 +203,8 @@
     pointer-events: auto; font: inherit; font-size: 11px; letter-spacing: 0.16em;
     text-transform: lowercase; color: rgba(215,224,245,0.62);
     background: rgba(255,255,255,0.03); border: 1px solid rgba(215,224,245,0.16);
-    padding: 9px 16px; border-radius: 999px; cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center;
+    min-height: 44px; padding: 9px 18px; border-radius: 999px; cursor: pointer;
     backdrop-filter: blur(6px); transition: color .2s, border-color .2s, background .2s;
   }
   .controls button:hover { color: #05070f; background: rgba(215,224,245,0.85); border-color: transparent; }
@@ -199,7 +221,7 @@
   <div class="brand">
     <a class="wordmark" href="https://playplayai.com/" target="_blank" rel="noopener">playplay<b>ai</b></a>
     <div class="tag">how ai search chooses what to cite</div>
-    <div class="credit">designed + coded by <a href="https://www.linkedin.com/in/ngenetti/" target="_blank" rel="noopener">Nora G.</a></div>
+    <div class="credit">designed + coded by <a href="https://playplayai.com" target="_blank" rel="noopener">PlayPlayAI</a></div>
     <a class="cta" href="https://seoaico.com" target="_blank" rel="noopener">SEOAIco.com</a>
   </div>
 
